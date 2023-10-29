@@ -1,35 +1,7 @@
 body{
     background-color:  #fdf1d3;
 }
-.navbar {
-    overflow: hidden;
-    position: fixed; 
-    top: 0; 
-    width: 100%; 
-  }
-.navbar ul{
-    list-style-type:none;
-}
-.navbar li{
-    display: inline;
-}
-.navbar a {
-    float: left;
-    display: block;
-    color: blue;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-.navbar a:hover {
-    color:#ff9900;
-  }
-  * {
-    margin: 0;
-    padding: 0;
-}
+
 #osnovno {
     width: 100%;
 }
@@ -107,30 +79,4 @@ div .upit p{
 }
 .sve{
   margin-bottom: 60px;
-}
-.profilna{
-  float:left;
-  margin-top: 60px;
-  margin-left: 10px;
-  margin-bottom: 10px;
-  width:30%;
-}
-
-.lijevakol{
-  clear: left;
-  float: left;
-  width: 20%;
-  
-}
-.desnakol{
-  float: right;
-  width: 80%;
-}
-div .lijevakol label {
-  margin: 20px 10px 20px 10px;
-  display: inline-block;
-}
-div .desnakol input {
-  margin: 10px 10px 20px 10px;
-  height: 30px;
 }

@@ -1,0 +1,30 @@
+body{
+    background-color:  #fdf1d3;
+}
+
+.profilna{
+  float:left;
+  margin-top: 60px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  width:30%;
+}
+
+.lijevakol{
+  clear: left;
+  float: left;
+  width: 20%;
+  
+}
+.desnakol{
+  float: right;
+  width: 80%;
+}
+div .lijevakol label {
+  margin: 20px 10px 20px 10px;
+  display: inline-block;
+}
+div .desnakol input {
+  margin: 10px 10px 20px 10px;
+  height: 30px;
+}
