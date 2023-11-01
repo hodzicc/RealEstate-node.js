@@ -1,11 +1,17 @@
 body{
     background-color:  #fdf1d3;
 }
+* {
+  margin: 0;
+  padding: 0;
+}
 .navbar {
     overflow: hidden;
     position: fixed; 
     top: 0; 
     width: 100%; 
+    z-index: 1;
+    background-color: white;
   }
 .navbar ul{
     list-style-type:none;
@@ -26,7 +32,3 @@ body{
 .navbar a:hover {
     color:#ff9900;
   }
-  * {
-    margin: 0;
-    padding: 0;
-}

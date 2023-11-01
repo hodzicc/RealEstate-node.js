@@ -1,0 +1,86 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+h2{
+    margin-top:50px;
+    margin-left: 20px;
+}
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 300px);
+    gap: 20px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.property {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: white;
+}
+
+.apartment {
+    background-color: white;
+}
+
+.house {
+    background-color: powderblue;
+}
+
+.business {
+    background-color: green;
+}
+
+.property img {
+    max-width: 100%;
+    height: auto;
+}
+#lijevo{
+    float: left;
+    width: 50%;
+  }
+  div #lijevo p{
+    padding-top: 10px;
+  }
+  #desno{
+    float: right;
+    width: 50%;
+  }
+  div #desno p{
+    padding-top: 10px;
+  }
+
+.property-info {
+    display: flex;
+    justify-content: space-between;
+}
+
+.property h3 {
+    text-align: left;
+    margin: 10px 0;
+}
+
+.detalji-button {
+margin: 0 auto;
+display: block;
+background-color: blue;
+color: white;
+border: none;
+padding: 10px 20px;
+margin-top: 20px;
+font-weight: bold;
+cursor: pointer;
+}
+.detalji-button a{
+    color:white;
+    text-decoration: none;
+}
+.detalji-button:hover {
+background-color: #ff9900;
+}
+
+
