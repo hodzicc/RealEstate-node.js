@@ -73,8 +73,10 @@ div #ispod p{
   margin-bottom: 20px;
   border: 1px solid black;
   background-color: white;
+  list-style: none;
 }
-div .upit p{
+
+.upit p{
   padding: 10px;
 }
 .sve{
