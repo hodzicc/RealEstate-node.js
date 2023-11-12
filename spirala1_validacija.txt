@@ -1,0 +1,16 @@
+Validacija html:
+Koristila sam validator.w3.org
+Za meni.html nisam dobila nikakve errore
+Za detalji.html sam dobila error vezan za img, trebalo je dodati alt atribut
+Za nekretnine.html sam dobila 22 errora jer sam imala više istih id-eva, to sam promijenila u class. 
+I error je bio kod korištenja <button> i <a> zajedno, tako da sam taj link skroz isključila s obzirom na to da je to u spirali
+svakako bilo opcionalno.
+Za prijava.html sam dobila 3 errora, međutim to je jer je dokument prazan
+Za profil.html nema errora
+
+Validacija css:
+Koristila sam https://jigsaw.w3.org/css-validator/#validate_by_upload
+Za detalji.css nema errora
+Za meni.css nema errora
+Za nekretnine.css nema errora
+Za profil.css nema errora
