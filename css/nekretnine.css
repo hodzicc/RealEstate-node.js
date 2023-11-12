@@ -6,6 +6,7 @@ body {
 h2{
     margin-top:50px;
     margin-left: 20px;
+    text-decoration: none;
 }
 .container {
     display: grid;
@@ -39,18 +40,18 @@ h2{
     max-width: 100%;
     height: auto;
 }
-#lijevo{
+.lijevo{
     float: left;
     width: 50%;
   }
-  div #lijevo p{
+  div .lijevo p{
     padding-top: 10px;
   }
-  #desno{
+  .desno{
     float: right;
     width: 50%;
   }
-  div #desno p{
+  div .desno p{
     padding-top: 10px;
   }
 
