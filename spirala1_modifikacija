@@ -1,0 +1,5 @@
+Urađene modifikacije za zadatak 2:
+Prije sam koristila float: left, float: right i clear za prikazivanje elemenata. 
+Međutim kako je sada potrebno mijenjati izgled u odnosu na sirinu ekrana, koristila sam grid.
+Stavila sam sliku da zauzima prva 2 reda i prvu kolonu, a ispod elemente u naredne redove i prvu i drugu kolonu.
+Također, koristila sam @media za različite stilove za različite širine.
