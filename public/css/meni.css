@@ -1,0 +1,21 @@
+a{
+  padding: 8pt 8pt;
+  text-decoration: none;
+  font-weight: bolder;
+  color: blue;
+}
+
+a:hover {
+  color: #ff9900;
+}
+
+ul{
+  padding: 0;
+  margin: 0 auto;
+  list-style: none;
+  position: fixed;
+}
+
+li{
+  display: inline;
+}
