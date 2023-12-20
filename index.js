@@ -38,16 +38,12 @@ app.get('/:page', (req, res) => {
 const page = req.params.page || 'meni.html';
 res.sendFile(path.join(__dirname, 'public','html', page));
 });
-
+app.use(bodyParser.urlencoded({ extended: true }));
 app.post('/login', (req, res) =>{
 
-    let body = '';
-
-    req.on('data', (chunk) => {
-            body += chunk;
-    });
-    req.on('end', () => {
-        const { username, password } = querystring.parse(body);
+    let body = req.body;
+    const username = body['username'];
+    const password = body['password'];
 
     const user = users.find((user) => user.username === username);
 
@@ -57,8 +53,7 @@ app.post('/login', (req, res) =>{
         if (result) {          
             req.session.loggedIn = true;
             req.session.username = username; 
-          //  return res.status(200).json({ poruka: 'Uspješna prijava' });
-            res.redirect("/meni.html");
+            return res.status(200).json({ poruka: 'Uspješna prijava' });
         } else {
           return res.status(401).json({ greska: 'Neuspješna prijava' });
           
@@ -67,20 +62,20 @@ app.post('/login', (req, res) =>{
     } else {
       return res.status(401).json({ greska: 'Neuspješna prijava' });
     }
-    });
+   
 });
 
 app.post('/logout', (req, res) => {
-  console.log("bla");
-  // Check if the user is logged in
+
   if (req.session.loggedIn) {
+   
       // Clear user session data
       req.session.loggedIn = false;
       req.session.username = null;
-      res.status(200).json({ poruka: 'Uspješno ste se odjavili' });
+      return res.status(200).json({ poruka: 'Uspješno ste se odjavili' });
   } else {
       // If the user is not logged in, return unauthorized access error
-      res.status(401).json({ greska: 'Neautorizovan pristup' });
+      return res.status(401).json({ greska: 'Neautorizovan pristup' });
   }
 });
 
@@ -95,18 +90,20 @@ app.get('/korisnik', (req, res)=>{
       prezime: user.prezime,
       username: user.username
   };
-  res.status(200).json(userData);
+  return res.status(200).json(userData);
 } else 
     // If the user is not logged in, return unauthorized access error
-    res.status(401).json({ greska: 'Neautorizovan pristup' });
+    return res.status(401).json({ greska: 'Neautorizovan pristup' });
 });
 
 app.post('/upit', (req, res) => {
   // Check if the user is logged in
   if (req.session.loggedIn) {
       // Get data from the request body
-      const { nekretnina_id, tekst_upita } = req.body;
+      let body = req.body;
 
+      const nekretnina_id = body['nekretnina_id'];
+      const tekst_upita = body['tekst_upita']
       // Find the user in your data
       const user = users.find((user) => user.username === req.session.username);
 
@@ -125,15 +122,15 @@ app.post('/upit', (req, res) => {
               nekretnina.upiti.push(newQuery);
 
               // Return success message
-              res.status(200).json({ poruka: 'Upit je uspješno dodan' });
+              return res.status(200).json({ poruka: 'Upit je uspješno dodan' });
           } else {
               // If the property is not found, return an error
-              res.status(400).json({ greska: `Nekretnina sa id-em ${nekretnina_id} ne postoji` });
+              return res.status(400).json({ greska: `Nekretnina sa id-em ${nekretnina_id} ne postoji` });
           }
       
   } else {
       // If the user is not logged in, return unauthorized access error
-      res.status(401).json({ greska: 'Neautorizovan pristup' });
+      return res.status(401).json({ greska: 'Neautorizovan pristup' });
   }
 });
 
@@ -141,8 +138,12 @@ app.put('/korisnik', (req, res) => {
   // Check if the user is logged in
   if (req.session.loggedIn) {
       // Get data from the request body
-      const { ime, prezime, username, password } = req.body;
+      let body = req.body;
 
+      const ime = body['ime'];
+      const prezime = body['prezime'];
+      const username = body['username'];
+      const password = body['password'];
       // Find the user in your data
       const user = users.find((user) => user.username === req.session.username);
           // If the property is found, add a new query
@@ -161,17 +162,17 @@ app.put('/korisnik', (req, res) => {
                 });
             }
               // Return success message
-            res.status(200).json({ poruka: 'Podaci su uspješno ažurirani' });
+           return res.status(200).json({ poruka: 'Podaci su uspješno ažurirani' });
           } 
       
   } else {
       // If the user is not logged in, return unauthorized access error
-      res.status(401).json({ greska: 'Neautorizovan pristup' });
+      return res.status(401).json({ greska: 'Neautorizovan pristup' });
   }
 });
 
 app.get('/nekretnine', (req, res)=>{ 
-  res.status(200).json(nekretnine);
+  return res.status(200).json(nekretnine);
 });
 
 app.listen(PORT, () => {

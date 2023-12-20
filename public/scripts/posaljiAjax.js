@@ -6,25 +6,33 @@ window.onload=function(){
     nekretnineElement = document.getElementById("nekretnine");
     detaljiElement = document.getElementById("detalji");
     meniAjax(null,prikaziMeni);
-    odjavaElement.addEventListener("click",function(){logoutAjax(prikaziMeni);})
+    odjavaElement.addEventListener("click",function (event) {       
+        event.preventDefault();         
+        logoutAjax(function(err){
+        if(err)
+            alert("Neautorizovan pristup");
+        else
+        window.open("../meni.html", "_top");
+        } );
+    });
 }
 function prikaziMeni(isLoggedIn) {
     if (isLoggedIn) {
-        // User is logged in
-        prijavaElement.style.visibility = "collapse";
-        odjavaElement.style.visibility = "visible";
-        profilElement.style.visibility = "visible";
-        nekretnineElement.style.visibility = "visible";
-        detaljiElement.style.visibility = "visible";
+
+        prijavaElement.style.display = "none";
+        odjavaElement.style.display = "inline-block";
+        profilElement.style.display = "inline-block";
+        nekretnineElement.style.display = "inline-block";
+        detaljiElement.style.display = "inline-block";
 
 
     } else {
         // User is not logged in
-        prijavaElement.style.visibility = "visible";
-        odjavaElement.style.visibility = "collapse";
-        profilElement.style.visibility = "collapse";
-        nekretnineElement.style.visibility = "visible";
-        detaljiElement.style.visibility = "visible";
+        prijavaElement.style.display = "inline-block";
+        odjavaElement.style.display = "none";
+        profilElement.style.display = "none";
+        nekretnineElement.style.display = "inline-block";
+        detaljiElement.style.display = "inline-block";
         
     }
 }
@@ -46,16 +54,16 @@ function meniAjax(loggedIn,fnCallback){
 }
 
 function logoutAjax(fnCallback){
+ 
    let ajax = new XMLHttpRequest();
    ajax.onreadystatechange = function() {// Anonimna funkcija
-       if (ajax.readyState == 4 && ajax.status == 200){
+       if(ajax.readyState==4 && ajax.status == 200){
            fnCallback(false);
        }
-       else if (ajax.readyState == 4)
-           fnCallback(ajax.statusText,null);
+       else if (ajax.status == 401)
+           fnCallback(true);
    }
    ajax.open("POST","http://localhost:3000/logout",true);
-   ajax.setRequestHeader("Content-Type", "application/json");
-   ajax.send(JSON.stringify({loggedIn:false}));
+   ajax.send();
    
 }
