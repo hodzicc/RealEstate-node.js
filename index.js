@@ -23,7 +23,7 @@ app.use(
 
   app.use(express.static(path.join(__dirname, 'public')));
 
-  // Middleware to check if the user is logged in
+ 
 app.use((req, res, next) => {
     res.locals.user = req.session.username;
     next();
@@ -34,11 +34,29 @@ app.use((req, res, next) => {
     res.json({loggedIn: loggedIn});  
   });
 
+  
+
+app.get('/korisnik', (req, res) => {
+  if (req.session.loggedIn) {
+      const user = users.find((user) => user.username === req.session.username);
+      if (user) {
+          return res.status(200).json(user);
+      } else {
+          return res.status(404).json({ greska: 'Korisnik nije pronađen' });
+      }
+  } else {
+      return res.status(401).json({ greska: 'Neautorizovan pristup' });
+  }
+});
+
+
 app.get('/:page', (req, res) => {
 const page = req.params.page || 'meni.html';
 res.sendFile(path.join(__dirname, 'public','html', page));
 });
+
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.post('/login', (req, res) =>{
 
     let body = req.body;
@@ -46,7 +64,6 @@ app.post('/login', (req, res) =>{
     const password = body['password'];
 
     const user = users.find((user) => user.username === username);
-
     if (user) {
       
       bcrypt.compare(password, user.password, (err, result) => {
@@ -79,22 +96,6 @@ app.post('/logout', (req, res) => {
   }
 });
 
-
-
-app.get('/korisnik', (req, res)=>{
-  const user = users.find((user) => user.username === req.session.username);
-  if (user) {
-    const userData = {
-      id: user.id,
-      ime: user.ime,
-      prezime: user.prezime,
-      username: user.username
-  };
-  return res.status(200).json(userData);
-} else 
-    // If the user is not logged in, return unauthorized access error
-    return res.status(401).json({ greska: 'Neautorizovan pristup' });
-});
 
 app.post('/upit', (req, res) => {
   // Check if the user is logged in
