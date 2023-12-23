@@ -2,18 +2,31 @@
 <html>
 <head>
     <title>Nekretnine</title> 
-    <link rel="stylesheet" type="text/css" href="../css/nekretnine.css">
+ 
     <link rel="stylesheet" type="text/css" href="../css/meni.css"> 
-
-   <script src="../scripts/poziviAjax.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="../css/nekretnine.css">
+  
     <script src="../scripts/SpisakNekretnina.js" defer></script>
+    <script src="../scripts/poziviAjax.js" defer></script>
     <script src="../scripts/nekretnine.js" defer></script>
-    
+
     <meta charset="UTF-8">
 
 </head>
 <body>
     <iframe src="meni.html"></iframe>
+
+    <div id="search-container">
+        <label for="minPrice">Min Price:</label>
+        <input type="number" id="minPrice" name="minPrice"> <!-- Set a default value -->
+        <label for="maxPrice">Max Price:</label>
+        <input type="number" id="maxPrice" name="maxPrice"> <!-- Set a default value -->
+        <label for="minArea">Min Area:</label>
+        <input type="number" id="minArea" name="minArea"> <!-- Set a default value -->
+        <label for="maxArea">Max Area:</label>
+        <input type="number" id="maxArea" name="maxArea"> <!-- Set a default value -->
+        <button type="button" id="search" onclick="performSearch()">Search</button>
+    </div>
 
     <div id="stan">
     </div>

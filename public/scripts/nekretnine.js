@@ -64,20 +64,59 @@ function spojiNekretnine(divReferenca, instancaModula, tip_nekretnine) {
 const divStan = document.getElementById("stan");
 const divKuca = document.getElementById("kuca");
 const divPp = document.getElementById("pp");
-
+let nekretnine, nekretnine1;
 // Fetch nekretnine from the server
 PoziviAjax.getNekretnine((err, data) => {
-  if (err) {
-      console.error("Error fetching nekretnine:", err);
-      return;
-  }
+    if (err) {
+        console.error("Error fetching nekretnine:", err);
+        return;
+    }
 
-  // Initialize the module with fetched data
-  let nekretnine = SpisakNekretnina();
-  nekretnine.init(data, []);
+    // Initialize the module with fetched data
+    nekretnine = SpisakNekretnina();
+    nekretnine.init(data, []);
+    nekretnine1=data;
 
-  // Display properties
-  spojiNekretnine(divStan, nekretnine, "Stan");
-  spojiNekretnine(divKuca, nekretnine, "Kuća");
-  spojiNekretnine(divPp, nekretnine, "Poslovni prostor");
-});
+    // Display properties initially
+    spojiNekretnine(divStan, nekretnine, "Stan");
+    spojiNekretnine(divKuca, nekretnine, "Kuća");
+    spojiNekretnine(divPp, nekretnine, "Poslovni prostor");
+    window.nekretnine = nekretnine;
+
+   
+  });
+    
+ // Search Button Click Event
+    document.getElementById("search").addEventListener("click", performSearch);
+
+    function performSearch() {
+
+        // Get search criteria from input fields
+        const minPrice = parseFloat(document.getElementById("minPrice").value) || undefined;
+        const maxPrice = parseFloat(document.getElementById("maxPrice").value) || undefined;
+        const minArea = parseFloat(document.getElementById("minArea").value) || undefined;
+        const maxArea = parseFloat(document.getElementById("maxArea").value) || undefined;
+
+        // Call the filtrirajNekretnine method with search criteria
+        const filtered = nekretnine.filtrirajNekretnine({
+            min_cijena: minPrice,
+            max_cijena: maxPrice,
+            min_kvadratura: minArea,
+            max_kvadratura: maxArea
+        });
+
+        let nekretnine2 = SpisakNekretnina();
+        nekretnine2.init(filtered, []);
+
+      
+
+        // Clear existing properties
+        divStan.innerHTML = "";
+        divKuca.innerHTML = "";
+        divPp.innerHTML = "";
+
+        // Display filtered properties
+        spojiNekretnine(divStan, nekretnine2, "Stan");
+        spojiNekretnine(divKuca, nekretnine2, "Kuća");
+        spojiNekretnine(divPp, nekretnine2, "Poslovni prostor");
+    }
