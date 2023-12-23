@@ -49,11 +49,10 @@ app.get('/korisnik', (req, res) => {
   }
 });
 
-
-app.get('/:page', (req, res) => {
-const page = req.params.page || 'meni.html';
-res.sendFile(path.join(__dirname, 'public','html', page));
+app.get('/nekretnine', (req, res)=>{ 
+  return res.status(200).json(nekretnine);
 });
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -172,10 +171,11 @@ app.put('/korisnik', (req, res) => {
   }
 });
 
-app.get('/nekretnine', (req, res)=>{ 
-  return res.status(200).json(nekretnine);
-});
-
+app.get('/:page', (req, res) => {
+  const page = req.params.page || 'meni.html';
+  res.sendFile(path.join(__dirname, 'public','html', page));
+  });
+  
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
