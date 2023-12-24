@@ -21,13 +21,17 @@ function spojiNekretnine(divReferenca, instancaModula, tip_nekretnine) {
   filtriraneNekretnine.forEach(nekretnina => {
     // Kreiranje HTML elementa za prikaz nekretnine
     const nekretninaElement= document.createElement('div');
-     
+  
+    nekretninaElement.classList.add("nekretnina");
     if(tip_nekretnine=="Stan")
     nekretninaElement.classList.add("property", "stan");
   else if( tip_nekretnine=="Kuća")
    nekretninaElement.classList.add("property", "kuca");
   else if (tip_nekretnine=="Poslovni prostor")
   nekretninaElement.classList.add("property", "pp");
+
+  nekretninaElement.dataset.id = nekretnina.id;
+
 
     const imgElement = createElement('img', null, null);
     imgElement.src = "https://www.apartments.com/blog/sites/default/files/styles/x_large_hq/public/image/2023-06/ParkLine-apartment-in-Miami-FL.jpg?itok=kQmw64UU";
@@ -49,6 +53,27 @@ function spojiNekretnine(divReferenca, instancaModula, tip_nekretnine) {
     nekretninaElement.appendChild(imgElement);
     nekretninaElement.appendChild(propertyInfoElement);
     nekretninaElement.appendChild(createElement('button', 'detalji-button', 'Detalji'));
+    const detaljiButton = nekretninaElement.querySelector('.detalji-button');
+
+    detaljiButton.addEventListener('click', function () {
+    
+      // Set the width of the nekretninaElement to 500px
+      nekretninaElement.style.width = '500px';
+
+      // Call the MarketingAjax.klikNekretnina method
+      MarketingAjax.klikNekretnina(nekretnina.id);
+    });
+    
+
+    const pretrageElement = createElement('div', 'pretrage');
+    pretrageElement.id = `pretrage-${nekretnina.id}`;
+
+    const klikoviElement = createElement('div', 'klikovi');
+    klikoviElement.id = `klikovi-${nekretnina.id}`;
+
+    // Append pretrage and klikovi elements to nekretninaElement
+    nekretninaElement.appendChild(pretrageElement);
+    nekretninaElement.appendChild(klikoviElement);
 
     // Dodavanje elementa u container
     containerElement.appendChild(nekretninaElement);
@@ -59,11 +84,13 @@ function spojiNekretnine(divReferenca, instancaModula, tip_nekretnine) {
   divReferenca.appendChild(h2Element);
   divReferenca.appendChild(containerElement);
   }
+
 }
 
 const divStan = document.getElementById("stan");
 const divKuca = document.getElementById("kuca");
 const divPp = document.getElementById("pp");
+const nekretninediv = document.getElementById("nekretninediv");
 let nekretnine, nekretnine1;
 // Fetch nekretnine from the server
 PoziviAjax.getNekretnine((err, data) => {
@@ -83,11 +110,15 @@ PoziviAjax.getNekretnine((err, data) => {
     spojiNekretnine(divPp, nekretnine, "Poslovni prostor");
     window.nekretnine = nekretnine;
 
-   
+    MarketingAjax.osvjeziPretrage(nekretninediv);
+    MarketingAjax.osvjeziKlikove(nekretninediv);
   });
     
  // Search Button Click Event
-    document.getElementById("search").addEventListener("click", performSearch);
+    document.getElementById("search").addEventListener("click", function(event){
+      event.preventDefault();
+      performSearch();
+    });
 
     function performSearch() {
 
@@ -119,4 +150,13 @@ PoziviAjax.getNekretnine((err, data) => {
         spojiNekretnine(divStan, nekretnine2, "Stan");
         spojiNekretnine(divKuca, nekretnine2, "Kuća");
         spojiNekretnine(divPp, nekretnine2, "Poslovni prostor");
+    
+        let lista = [];
+        filtered.forEach(nekretnina => {
+             lista.push(nekretnina.id);
+        });
+       
+        MarketingAjax.novoFiltriranje(lista);
+
     }
+

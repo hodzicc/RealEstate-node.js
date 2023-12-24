@@ -8,6 +8,7 @@
   
     <script src="../scripts/SpisakNekretnina.js" defer></script>
     <script src="../scripts/poziviAjax.js" defer></script>
+    <script src="../scripts/marketingAjax.js" defer></script>
     <script src="../scripts/nekretnine.js" defer></script>
 
     <meta charset="UTF-8">
@@ -25,14 +26,15 @@
         <input type="number" id="minArea" name="minArea"> <!-- Set a default value -->
         <label for="maxArea">Max Area:</label>
         <input type="number" id="maxArea" name="maxArea"> <!-- Set a default value -->
-        <button type="button" id="search" onclick="performSearch()">Search</button>
+        <button type="button" id="search">Search</button>
     </div>
-
+<div id="nekretninediv">
     <div id="stan">
     </div>
     <div id="kuca">
     </div>
     <div id="pp">
     </div>
+</div>
 </body>
 </html>

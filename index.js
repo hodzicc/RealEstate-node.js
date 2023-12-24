@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const querystring = require('querystring');
 const session = require('express-session');
 const fs = require('fs');
+const { prependListener } = require('process');
 
 const PORT = 3000;
 
@@ -20,6 +21,9 @@ app.use(
       saveUninitialized: true,
     })
   );
+
+let klikoviMap = new Map();
+let pretrageMap = new Map();
 
   app.use(express.static(path.join(__dirname, 'public')));
 
@@ -170,12 +174,94 @@ app.put('/korisnik', (req, res) => {
       return res.status(401).json({ greska: 'Neautorizovan pristup' });
   }
 });
+  
+app.post('/marketing/nekretnine', (req, res)=>{
+  const bod = req.body;
+  const nizNekretnina = bod['nizNekretnina'];
+
+  if (!nizNekretnina || !Array.isArray(nizNekretnina)) {
+    return res.status(400).send('Invalid request body');
+}
+
+nizNekretnina.forEach(idNekretnine => {
+    const pretrage = pretrageMap.get(idNekretnine) || 0;
+    pretrageMap.set(idNekretnine, pretrage + 1);
+});
+return res.status(200);
+
+});
+
+app.post('/marketing/nekretnina/:id', (req, res)=>{
+   const id = req.params.id;
+
+  const klikovi = klikoviMap.get(id) || 0;
+  klikoviMap.set(id, klikovi + 1);
+  
+  return res.status(200);
+
+});
+
+app.post('/marketing/osvjezi', (req, res) => {
+  const bod = req.body;
+  const nizNekretnina = bod['nizNekretnina'];
+
+  // Function to retrieve detailed information for a nekretnina
+  const getNekretninaInfo = (id) => ({
+      id,
+      pretrage: pretrageMap.get(id) || 0,
+      klikovi: klikoviMap.get(id) || 0,
+  });
+
+  if (nizNekretnina && Array.isArray(nizNekretnina) && nizNekretnina.length > 0) {
+      // Non-empty req.body, update session data
+      req.session.nekretnineDetails = nizNekretnina.map(getNekretninaInfo);
+  }
+  // Use session data to fetch IDs
+  let sessionNekretnine = req.session.nekretnineDetails || [];
+
+  const updatedNekretnine = sessionNekretnine
+  .map(({ id, pretrage, klikovi }) => {
+      const currentPretrage = pretrageMap.get(parseInt(id, 10)) || 0;
+      const currentKlikovi = klikoviMap.get(id) || 0;
+
+      // Check if the values have changed
+      const pretrageChanged = pretrage !== currentPretrage;
+      const klikoviChanged = klikovi !== currentKlikovi;
+
+      // Return data only if there's a change
+      if (pretrageChanged || klikoviChanged) {
+          return { id, klikovi: currentKlikovi, pretrage: currentPretrage };
+      }
+
+      return null;
+  })
+  .filter(Boolean);
+
+  
+
+      req.session.nekretnineDetails = sessionNekretnine
+      .map(({ id, pretrage, klikovi }) => {
+        
+          const currentPretrage = pretrageMap.get(parseInt(id, 10)) || 0;
+          const currentKlikovi = klikoviMap.get(id) || 0;
+
+          
+          return { id, klikovi: currentKlikovi, pretrage: currentPretrage };
+        
+      });
+
+      sessionNekretnine = req.session.nekretnineDetails || [];
+      
+   
+ return res.status(200).json({ nizNekretnina: updatedNekretnine });
+});
+
 
 app.get('/:page', (req, res) => {
   const page = req.params.page || 'meni.html';
   res.sendFile(path.join(__dirname, 'public','html', page));
   });
-  
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
