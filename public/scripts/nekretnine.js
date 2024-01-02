@@ -91,7 +91,7 @@ const divStan = document.getElementById("stan");
 const divKuca = document.getElementById("kuca");
 const divPp = document.getElementById("pp");
 const nekretninediv = document.getElementById("nekretninediv");
-let nekretnine, nekretnine1;
+let nekretnine;
 // Fetch nekretnine from the server
 PoziviAjax.getNekretnine((err, data) => {
     if (err) {
@@ -102,14 +102,14 @@ PoziviAjax.getNekretnine((err, data) => {
     // Initialize the module with fetched data
     nekretnine = SpisakNekretnina();
     nekretnine.init(data, []);
-    nekretnine1=data;
-
+    
     // Display properties initially
     spojiNekretnine(divStan, nekretnine, "Stan");
     spojiNekretnine(divKuca, nekretnine, "Kuća");
     spojiNekretnine(divPp, nekretnine, "Poslovni prostor");
     window.nekretnine = nekretnine;
 
+    MarketingAjax.novoFiltriranje(data);
     MarketingAjax.osvjeziPretrage(nekretninediv);
     MarketingAjax.osvjeziKlikove(nekretninediv);
   });
@@ -151,12 +151,11 @@ PoziviAjax.getNekretnine((err, data) => {
         spojiNekretnine(divKuca, nekretnine2, "Kuća");
         spojiNekretnine(divPp, nekretnine2, "Poslovni prostor");
     
-        let lista = [];
-        filtered.forEach(nekretnina => {
-             lista.push(nekretnina.id);
-        });
        
-        MarketingAjax.novoFiltriranje(lista);
+       
+        MarketingAjax.novoFiltriranje(filtered);
 
+        MarketingAjax.osvjeziPretrage(nekretninediv);
+        MarketingAjax.osvjeziKlikove(nekretninediv);
     }
 

@@ -1,135 +1,95 @@
 const MarketingAjax = (() => {
+  let prviPozivPretrage = true;
+  let prviPozivKlikovi = true;
+  let trenutniNiz = [];
 
-    // Function to send a POST request to /marketing/nekretnine
-    function novoFiltriranje(nekretnineIds) {
-       
-    fetch('/marketing/nekretnine', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nizNekretnina: nekretnineIds }),
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log('Successfully sent nekretnine request');
-        } else {
-            console.error('Failed to send nekretnine request');
-        }
-    })
-    .catch(error => {
-        console.error('Error sending nekretnine request:', error);
-    });
-    }
+  function osvjeziPretrage(divNekretnine){
+      setInterval(() => {
+      let ajax = new XMLHttpRequest();
+  
+      ajax.onreadystatechange = function() {
+          if (ajax.readyState == 4 && ajax.status == 200){
+              let nizNekretnina = JSON.parse(ajax.responseText);
 
-    function klikNekretnina(id) {
-       
-        fetch(`/marketing/nekretnina/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => {
-            if (response.ok) {
-                console.log(`Successfully sent nekretnina request for id: ${id}`);
-            } else {
-                console.error(`Failed to send nekretnina request for id: ${id}`);
-            }
-        })
-        .catch(error => {
-            console.error(`Error sending nekretnina request for id: ${id}`, error);
-        });
-    }
-
-    function updateCountsUI(sessionCounts, type) {
-        sessionCounts.forEach(({ id, pretrage, klikovi }) => {
-          const pretrageElement = document.getElementById(`pretrage-${id}`);
-          if (pretrageElement) {
-            pretrageElement.textContent = `Pretrage: ${pretrage}`;
+              for(let i = 0; i < nizNekretnina.length; i++){
+                  let pretrage = document.getElementById(`pretrage-${nizNekretnina[i].id}`);                 
+                  pretrage.textContent = `Pretrage: ${nizNekretnina[i].pretrage}`
+              }
           }
-          
-    
-          const klikoviElement = document.getElementById(`klikovi-${id}`);
-          if (klikoviElement) {
-            klikoviElement.textContent = `Klikovi: ${klikovi}`;
-          }
-        });
       }
-
-      let isFirstCall = true;
-
-      // Function to send a POST request to /marketing/nekretnine
-      function osvjeziPretrage(divNekretnine) {
       
-        // Extract IDs from divNekretnine
-        const nekretninaIds = Array.from(divNekretnine.querySelectorAll('.nekretnina'))
-       .map(nekretninaElement => nekretninaElement.dataset.id); 
+      ajax.open("POST", "http://localhost:3000/marketing/osvjezi", true);
+      ajax.setRequestHeader("Content-Type", "application/json");
+      if(prviPozivPretrage){
+          prviPozivPretrage = false;
+          ajax.send(JSON.stringify({ nizNekretnina: trenutniNiz}));
+      } else 
+      ajax.send();
+  }, 500);
+  }
 
-    
-        fetch('/marketing/osvjezi', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: isFirstCall ? JSON.stringify({ nizNekretnina: nekretninaIds }) : JSON.stringify({}),
-        })
-          .then(response => response.json())
-          .then(data => {
-            //console.log("preee: ". data.nizNekretnina);
-            // Update UI with new counts
-            updateCountsUI(data.nizNekretnina, 'pretrage');
-          })
-          .catch(error => {
-            console.error('Error updating pretrage counts:', error);
-          })
-          .finally(() => {
-            // After the first call, set isFirstCall to false
-            isFirstCall = false;
-            // Schedule the next call after 500ms
-            setTimeout(() => osvjeziPretrage(divNekretnine), 500);
-          });
+  function osvjeziKlikove(divNekretnine){
+      setInterval(() => {
+      let ajax = new XMLHttpRequest();
+  
+      ajax.onreadystatechange = function() {
+          if (ajax.readyState == 4 && ajax.status == 200){
+              let nizNekretnina = JSON.parse(ajax.responseText);
+
+              for(let i = 0; i < nizNekretnina.length; i++){
+                  let klikovi = document.getElementById(`klikovi-${nizNekretnina[i].id}`);
+                  klikovi.textContent = `Klikovi: ${nizNekretnina[i].klikovi}`;
+              }
+          }
       }
-      let isFirstCallK = true;
+      
+      ajax.open("POST", "http://localhost:3000/marketing/osvjezi", true);
+      ajax.setRequestHeader("Content-Type", "application/json");
+      if(prviPozivKlikovi){
+          prviPozivKlikovi = false;
+          ajax.send(JSON.stringify({ nizNekretnina: trenutniNiz}));
+      } else 
+      ajax.send();
+      }, 500);
+  }
 
-      // Function to send a POST request to /marketing/nekretnine
-      function osvjeziKlikove(divNekretnine) {
-        
-        // Extract IDs from divNekretnine
-        const nekretninaIds = Array.from(divNekretnine.querySelectorAll('.nekretnina'))
-       .map(nekretninaElement => nekretninaElement.dataset.id); 
-    
- 
-        fetch('/marketing/osvjezi', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: isFirstCallK ? JSON.stringify({ nizNekretnina: nekretninaIds }) : JSON.stringify({}),
-        })
-          .then(response => response.json())
-          .then(data => {
-          
-            // Update UI with new counts
-            updateCountsUI(data.nizNekretnina, 'klikovi');
-          })
-          .catch(error => {
-            console.error('Error updating klikovi counts:', error);
-          })
-          .finally(() => {
-            // After the first call, set isFirstCall to false
-            isFirstCallK = false;
-            // Schedule the next call after 500ms
-            setTimeout(() => osvjeziKlikove(divNekretnine), 500);
-          });
-      }
-    
+  function novoFiltriranje(listaFiltriranihNekretnina){
+      let ajax = new XMLHttpRequest();
+  
+      let nizIdeva = listaFiltriranihNekretnina.map(item => item.id);
 
-    return {
-        klikNekretnina,
-        novoFiltriranje,
-        osvjeziPretrage,
-        osvjeziKlikove
-        
-    };
+      ajax.onreadystatechange = function(){
+          if (ajax.readyState == 4 && ajax.status == 200){
+              trenutniNiz = nizIdeva;
+              prviPozivPretrage = true;
+              prviPozivKlikovi = true;
+          }
+      };
+      
+      ajax.open("POST", "http://localhost:3000/marketing/nekretnine", true);
+      ajax.setRequestHeader("Content-Type", "application/json");
+      ajax.send(JSON.stringify({nizNekretnina: nizIdeva}));
+  }
+
+  function klikNekretnina(idNekretnine){
+      let ajax = new XMLHttpRequest();
+
+      ajax.onreadystatechange = function(){
+          if (ajax.readyState == 4 && ajax.status == 200){
+              trenutniNiz = [idNekretnine];
+              prviPozivPretrage = true;
+              prviPozivKlikovi = true;
+          }
+      };
+
+      ajax.open("POST", `http://localhost:3000/marketing/nekretnina/${idNekretnine}`, true);
+      ajax.setRequestHeader("Content-Type", "application/json");
+      ajax.send();
+  }
+  return {
+      osvjeziPretrage: osvjeziPretrage,
+      osvjeziKlikove: osvjeziKlikove,
+      novoFiltriranje: novoFiltriranje,
+      klikNekretnina: klikNekretnina
+  };
 })();

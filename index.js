@@ -22,22 +22,13 @@ app.use(
     })
   );
 
-let klikoviMap = new Map();
-let pretrageMap = new Map();
-
-  app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
  
 app.use((req, res, next) => {
     res.locals.user = req.session.username;
     next();
   });
-
-  app.post('/meni.html', (req, res) => {
-    const loggedIn = req.session.loggedIn || false;
-    res.json({loggedIn: loggedIn});  
-  });
-
   
 
 app.get('/korisnik', (req, res) => {
@@ -175,85 +166,101 @@ app.put('/korisnik', (req, res) => {
   }
 });
   
-app.post('/marketing/nekretnine', (req, res)=>{
-  const bod = req.body;
-  const nizNekretnina = bod['nizNekretnina'];
-
-  if (!nizNekretnina || !Array.isArray(nizNekretnina)) {
-    return res.status(400).send('Invalid request body');
-}
-
-nizNekretnina.forEach(idNekretnine => {
-    const pretrage = pretrageMap.get(idNekretnine) || 0;
-    pretrageMap.set(idNekretnine, pretrage + 1);
-});
-return res.status(200);
-
-});
-
-app.post('/marketing/nekretnina/:id', (req, res)=>{
-   const id = req.params.id;
-
-  const klikovi = klikoviMap.get(id) || 0;
-  klikoviMap.set(id, klikovi + 1);
-  
-  return res.status(200);
-
-});
-
-app.post('/marketing/osvjezi', (req, res) => {
-  const bod = req.body;
-  const nizNekretnina = bod['nizNekretnina'];
-
-  // Function to retrieve detailed information for a nekretnina
-  const getNekretninaInfo = (id) => ({
-      id,
-      pretrage: pretrageMap.get(id) || 0,
-      klikovi: klikoviMap.get(id) || 0,
-  });
-
-  if (nizNekretnina && Array.isArray(nizNekretnina) && nizNekretnina.length > 0) {
-      // Non-empty req.body, update session data
-      req.session.nekretnineDetails = nizNekretnina.map(getNekretninaInfo);
-  }
-  // Use session data to fetch IDs
-  let sessionNekretnine = req.session.nekretnineDetails || [];
-
-  const updatedNekretnine = sessionNekretnine
-  .map(({ id, pretrage, klikovi }) => {
-      const currentPretrage = pretrageMap.get(parseInt(id, 10)) || 0;
-      const currentKlikovi = klikoviMap.get(id) || 0;
-
-      // Check if the values have changed
-      const pretrageChanged = pretrage !== currentPretrage;
-      const klikoviChanged = klikovi !== currentKlikovi;
-
-      // Return data only if there's a change
-      if (pretrageChanged || klikoviChanged) {
-          return { id, klikovi: currentKlikovi, pretrage: currentPretrage };
+//makreting nekretnine
+app.post('/marketing/nekretnine', function (req, res) {
+  let novePretrage = req.body.nizNekretnina;
+  fs.readFile('./public/data/marketing.json', 'utf8', (err, data) => {
+      if (err) {
+          return;
       }
 
-      return null;
-  })
-  .filter(Boolean);
+      pretrage = JSON.parse(data);
 
-  
+      let indeks;
+      for (let i = 0; i < novePretrage.length; i++) {
+          indeks = pretrage.findIndex(pretraga => pretraga.id === parseInt(novePretrage[i]));
+          if (indeks === -1) {
+              indeks = pretrage.length;
+              pretrage[indeks] = {
+                  id: parseInt(novePretrage[i]),
+                  pretrage: 0,
+                  klikovi: 0
+              };
+          }
+          pretrage[indeks].pretrage += 1;
+      }
 
-      req.session.nekretnineDetails = sessionNekretnine
-      .map(({ id, pretrage, klikovi }) => {
-        
-          const currentPretrage = pretrageMap.get(parseInt(id, 10)) || 0;
-          const currentKlikovi = klikoviMap.get(id) || 0;
-
-          
-          return { id, klikovi: currentKlikovi, pretrage: currentPretrage };
-        
+      fs.writeFile("./public/data/marketing.json", JSON.stringify(pretrage, null, 2), 'utf8', (err) => {
+          if (err) {
+              throw err;
+          }
+          return res.status(200).json();
       });
+  });
+});
 
-      sessionNekretnine = req.session.nekretnineDetails || [];
-      
-   
- return res.status(200).json({ nizNekretnina: updatedNekretnine });
+//marketing nekretnine id
+app.post('/marketing/nekretnina/:id', function (req, res) {
+  let noviPrikaz = req.params.id;
+
+  fs.readFile('./public/data/marketing.json', 'utf8', (err, data) => {
+      if (err) {
+          return;
+      }
+
+      pretrage = JSON.parse(data);
+
+      let indeks = pretrage.findIndex(pretraga => pretraga.id === parseInt(noviPrikaz));
+      if (indeks === -1) {
+          indeks = pretrage.length;
+          pretrage[indeks] = {
+              id: parseInt(noviPrikaz),
+              pretrage: 0,
+              klikovi: 0
+          };
+      }
+      pretrage[indeks].klikovi += 1;
+
+      fs.writeFile("./public/data/marketing.json", JSON.stringify(pretrage, null, 2), 'utf8', (err) => {
+          if (err) {
+              throw err;
+          }
+          return res.status(200).json();
+      });
+  });
+});
+
+//marketing osvjezi
+app.post('/marketing/osvjezi', function (req, res) {
+  fs.readFile('./public/data/marketing.json', 'utf8', (err, data) => {
+      if (err) {
+          return;
+      }
+
+      pretrage = JSON.parse(data);
+
+      if (req.body && req.body.nizNekretnina) {
+          let nizIdeva = req.body.nizNekretnina;
+          let nekretnine = [];
+
+          for (let i = 0; i < nizIdeva.length; i++)
+              nekretnine.push(pretrage.find(data => data.id === parseInt(nizIdeva[i])));
+
+          req.session.nizNekretnina = nekretnine;
+          return res.status(200).json(nekretnine);
+      } else {
+          const nizNekretnina = req.session.nizNekretnina;
+          let promijenjeneNekretnine = [];
+
+          for (let i = 0; i < nizNekretnina.length; i++) {
+              let podaci = pretrage.find(data => data.id === parseInt(nizNekretnina[i].id));
+
+              if (podaci && (podaci.klikovi !== parseInt(nizNekretnina[i].klikovi) || podaci.pretrage !== parseInt(nizNekretnina[i].pretraga)))
+                  promijenjeneNekretnine.push(podaci);
+          }
+          return res.status(200).json(promijenjeneNekretnine);
+      }
+  });
 });
 
 

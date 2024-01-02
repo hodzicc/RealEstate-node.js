@@ -1,68 +1,45 @@
 const PoziviAjax = (() => {
+    // fnCallback se u svim metodama poziva kada stigne odgovor sa servera putem Ajax-a
+    // svaki callback kao parametre ima error i data,
+    // error je null ako je status 200 i data je tijelo odgovora
+    // ako postoji greška, poruka se prosljeđuje u error parametru callback-a, a data je tada null
+    function posaljiAjax(metoda, stranica, podaci, fnCallback){
+        let ajax = new XMLHttpRequest();
+    
+        ajax.onreadystatechange = function() {
+            if (ajax.readyState == 4 && ajax.status == 200)
+                fnCallback(null, JSON.parse(ajax.responseText));
+            else if (ajax.readyState == 4)
+                fnCallback(ajax.statusText, null);
+        }
+        
+        ajax.open(metoda, "http://localhost:3000/" + stranica, true);
+        ajax.setRequestHeader("Content-Type", "application/json");
+        ajax.send(podaci);
+    }
 
     function impl_getKorisnik(fnCallback) {
-        fetch("http://localhost:3000/korisnik")
-            .then(response => response.json())
-            .then(data => fnCallback(null, data))
-            .catch(error => fnCallback(error, null));
+        posaljiAjax("GET", "korisnik", null, fnCallback);
     }
 
     function impl_putKorisnik(noviPodaci, fnCallback) {
-        fetch("http://localhost:3000/korisnik", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(noviPodaci)
-        })
-            .then(response => response.json())
-            .then(data => fnCallback(null, data))
-            .catch(error => fnCallback(error, null));
+        posaljiAjax("PUT", "korisnik", JSON.stringify(noviPodaci), fnCallback);
     }
 
     function impl_postUpit(nekretnina_id, tekst_upita, fnCallback) {
-        fetch("http://localhost:3000/upit", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ nekretnina_id, tekst_upita })
-        })
-            .then(response => response.json())
-            .then(data => fnCallback(null, data))
-            .catch(error => fnCallback(error, null));
+        posaljiAjax("POST", "upit", JSON.stringify({nekretnina_id: nekretnina_id, tekst_upita: tekst_upita}), fnCallback);
     }
 
     function impl_getNekretnine(fnCallback) {
-        fetch("http://localhost:3000/nekretnine")
-            .then(response => response.json())
-            .then(data => fnCallback(null, data))
-            .catch(error => fnCallback(error, null));
+        posaljiAjax("GET", "nekretnine", null, fnCallback);
     }
 
     function impl_postLogin(username, password, fnCallback) {
-        fetch("http://localhost:3000/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ username, password })
-        })
-            .then(response => response.json())
-            .then(data => fnCallback(null, data))
-            .catch(error => fnCallback(error, null));
+        posaljiAjax("POST", "login", JSON.stringify({username: username, password: password}), fnCallback);
     }
 
     function impl_postLogout(fnCallback) {
-        fetch("http://localhost:3000/logout", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-            .then(response => response.json())
-            .then(data => fnCallback(null, data))
-            .catch(error => fnCallback(error, null));
+        posaljiAjax("POST", "logout", null, fnCallback);
     }
 
     return {
