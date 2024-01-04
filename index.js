@@ -91,80 +91,68 @@ app.post('/logout', (req, res) => {
 });
 
 
-app.post('/upit', (req, res) => {
-  // Check if the user is logged in
-  if (req.session.loggedIn) {
-      // Get data from the request body
-      let body = req.body;
 
-      const nekretnina_id = body['nekretnina_id'];
-      const tekst_upita = body['tekst_upita']
-      // Find the user in your data
-      const user = users.find((user) => user.username === req.session.username);
+app.put('/korisnik', function (req, res) {
+    if (!req.session.loggedIn) {
+        return res.status(401).json({ greska: 'Neautorizovan pristup' });
+    }
 
-          // Find the property in nekretnine.json
-          const nekretnina = nekretnine.find((property) => property.id === nekretnina_id);
+    let novoIme = req.body.ime;
+    let novoPrezime = req.body.prezime;
+    let noviUsername = req.body.username;
+    let noviPassword = req.body.password;
+    let userIndex = users.findIndex(user => user.username == req.session.username);
 
-          // If the property is found, add a new query
-          if (nekretnina) {
-              // Create a new query object
-              const newQuery = {
-                  id_korisnika: user.id,
-                  tekst_upita: tekst_upita
-              };
+    if (novoIme) {
+        users[userIndex].ime = novoIme
+    }
+    if (novoPrezime) {
+        users[userIndex].prezime = novoPrezime;
+    }
+    if (noviUsername) {
+        users[userIndex].username = noviUsername;
+        req.session.username = noviUsername;
+    }
+    if (noviPassword) {
+        bcrypt.hash(noviPassword, 10, function (err, hash) {
+            if (!err)
+                users[userIndex].password = hash;
+        });
+    }
 
-              // Add the new query to the property's queries array
-              nekretnina.upiti.push(newQuery);
-
-              // Return success message
-              return res.status(200).json({ poruka: 'Upit je uspješno dodan' });
-          } else {
-              // If the property is not found, return an error
-              return res.status(400).json({ greska: `Nekretnina sa id-em ${nekretnina_id} ne postoji` });
-          }
-      
-  } else {
-      // If the user is not logged in, return unauthorized access error
-      return res.status(401).json({ greska: 'Neautorizovan pristup' });
-  }
+    fs.writeFile("./public/data/korisnici.json", JSON.stringify(users, null, 2), 'utf8', (err) => {
+        if (err) {
+            throw err;
+        }
+        return res.status(200).json({ 'poruka': 'Upit je uspješno dodan' });
+    });
 });
 
-app.put('/korisnik', (req, res) => {
-  // Check if the user is logged in
-  if (req.session.loggedIn) {
-      // Get data from the request body
-      let body = req.body;
 
-      const ime = body['ime'];
-      const prezime = body['prezime'];
-      const username = body['username'];
-      const password = body['password'];
-      // Find the user in your data
-      const user = users.find((user) => user.username === req.session.username);
-          // If the property is found, add a new query
-          if (user) {
-            if (ime) user.ime = ime;
-            if (prezime) user.prezime = prezime;
-            if (username) user.username = username;
-            if (password) {
-                // Hash and update the password
-                bcrypt.hash(password, 10, function(err, hash) {
-                    if (err) {
-                        return res.status(500).json({ greska: 'Greška prilikom ažuriranja lozinke' });
-                    }
-                    user.password = hash;
-                   
-                });
-            }
-              // Return success message
-           return res.status(200).json({ poruka: 'Podaci su uspješno ažurirani' });
-          } 
-      
-  } else {
-      // If the user is not logged in, return unauthorized access error
-      return res.status(401).json({ greska: 'Neautorizovan pristup' });
-  }
+app.post('/upit', function (req, res) {
+    if (!req.session.loggedIn) {
+        return res.status(401).json({ 'greska': 'Neautorizovan pristup' });
+    }
+
+    const id = req.body.nekretnina_id;
+    const sadrzaj = req.body.tekst_upita;
+    const user = users.find(user => user.username == req.session.username);
+    const nekretninaIndeks = nekretnine.findIndex(nekretnina => nekretnina.id == id);
+
+    if (nekretninaIndeks === -1) {
+        return res.status(400).json({ 'greska': `Nekretnina sa id-em ${id} ne postoji` });
+    }
+
+    nekretnine[nekretninaIndeks].upiti.push({ korisnik_id: user.id, tekst_upita: sadrzaj });
+
+    fs.writeFile("./public/data/nekretnine.json", JSON.stringify(nekretnine, null, 2), 'utf8', (err) => {
+        if (err) {
+            throw err;
+        }
+        return res.status(200).json({ 'poruka': 'Upit je uspješno dodan' });
+    });
 });
+
   
 //makreting nekretnine
 app.post('/marketing/nekretnine', function (req, res) {

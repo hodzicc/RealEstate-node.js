@@ -37,7 +37,7 @@ function prikaziMeni(isLoggedIn) {
 
 function meniAjax(fnCallback) {
     PoziviAjax.getKorisnik(function (err, data) {
-        if (data.id==null) {
+        if (!data) {
             fnCallback(false); // Assume not logged in on error
         } else {
             fnCallback(true);
