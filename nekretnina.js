@@ -9,7 +9,7 @@ module.exports = function(sequelize,DataTypes){
         tip_grijanja: Sequelize.STRING,
         lokacija: Sequelize.STRING,
         godina_izgradnje: Sequelize.INTEGER,
-        datum_objave: Sequelize.DATE,
+        datum_objave: Sequelize.STRING,
         opis: Sequelize.STRING,
         pretrage: Sequelize.INTEGER,
         klikovi: Sequelize.INTEGER

@@ -81,7 +81,7 @@ app.post('/login', async (req, res) =>{
    
 });
 
-app.post('/logout', (req, res) => {
+app.post('/logout', async(req, res) => {
 
   if (req.session.loggedIn) {
    
@@ -157,23 +157,22 @@ app.post('/upit', async function (req, res) {
         if (nekretnina) {
             // Create a new query object
             const newQuery = {
-                tekst: sadrzaj 
+                tekst: sadrzaj ,
+                NekretninaId: nekretnina.id,
+                KorisnikId: user.id
             };
 
-            // Add the new query to the property's queries using Sequelize association
             const createdQuery = await db.upit.create(newQuery);
-            await nekretnina.setNekretninaUpiti(createdQuery);
-            await user.setKorisnikUpiti(createdQuery);
-
+            
             // Return success message
             return res.status(200).json({ poruka: 'Upit je uspješno dodan' });
         } else {
             // If the property is not found, return an error
-            return res.status(400).json({ greska: `Nekretnina sa id-em ${id} ne postoji` });
+            return res.status(401).json({ greska: `Nekretnina sa id-em ${id} ne postoji` });
         }
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ greska: 'Greška prilikom dodavanja upita' });
+        return res.status(401).json({ greska: 'Greška prilikom dodavanja upita' });
     }
 });
 
@@ -195,7 +194,7 @@ app.post('/marketing/nekretnine', async function (req, res) {
         return res.status(200).json();
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ greska: 'Greška prilikom ažuriranja pretraga' });
+        return res.status(401).json({ greska: 'Greška prilikom ažuriranja pretraga' });
     }
 });
 
@@ -213,7 +212,7 @@ app.post('/marketing/nekretnina/:id', async function (req, res) {
         return res.status(200).json();
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ greska: 'Greška prilikom ažuriranja broja klikova' });
+        return res.status(401).json({ greska: 'Greška prilikom ažuriranja broja klikova' });
     }
 });
 
@@ -243,6 +242,7 @@ app.post('/marketing/osvjezi', async function (req, res) {
           const nizNekretnina = req.session.nizNekretnina;
           let promijenjeneNekretnine = [];
 
+          if(nizNekretnina)
           for (let i = 0; i < nizNekretnina.length; i++) {
               let podaci =await db.nekretnina.findByPk(parseInt(nizNekretnina[i].id));
 
@@ -258,8 +258,53 @@ app.post('/marketing/osvjezi', async function (req, res) {
   
 });
 
+// Marketing nekretnine by ID
+app.get('/nekretnina/:id', async function (req, res) {
+   try{
+        const id = req.params.id;
+        const nekretnina = await db.nekretnina.findByPk(parseInt(id));
+       const niz = [];
+        if (nekretnina) {
+            const upiti = await db.upit.findAll({
+                where: { NekretninaId: nekretnina.id },
+              });
+           
+            for (const u of upiti){
+                const korisnik = await db.korisnik.findOne({
+                    where: { id: u.KorisnikId }
+                });
+                niz.push({
+                    username: korisnik.username,
+                    tekst: u.tekst
+                });
 
-app.get('/:page', (req, res) => {
+            }
+            
+            const response = {
+                id: nekretnina.id,
+                naziv: nekretnina.naziv,
+                kvadratura: nekretnina.kvadratura,
+                cijena: nekretnina.cijena,
+                tip_grijanja: nekretnina.tip_grijanja,
+                lokacija: nekretnina.lokacija,
+                godina_izgradnje: nekretnina.godina_izgradnje,
+                datum_objave: nekretnina.datum_objave,
+                opis: nekretnina.opis,
+                pretrage: nekretnina.pretrage,
+                klikovi: nekretnina.klikovi,
+                upiti: niz
+            };
+            return res.status(200).json(response);
+        }
+
+        return res.status(400).json({greska:`Nekretnina sa id-em ${id} ne postoji`});
+    } catch (err) {
+        console.error(err);
+        return res.status(400).json({ greska: 'Greška prilikom pristupanja bazi' });
+    }
+});
+
+app.get('/:page', async(req, res) => {
   const page = req.params.page || 'meni.html';
   res.sendFile(path.join(__dirname, 'public','html', page));
   });

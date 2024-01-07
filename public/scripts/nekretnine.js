@@ -62,6 +62,7 @@ function spojiNekretnine(divReferenca, instancaModula, tip_nekretnine) {
 
       // Call the MarketingAjax.klikNekretnina method
       MarketingAjax.klikNekretnina(nekretnina.id);
+      handleDetaljiClick(nekretnina.id);
     });
     
 
@@ -159,3 +160,46 @@ PoziviAjax.getNekretnine((err, data) => {
         MarketingAjax.osvjeziKlikove(nekretninediv);
     }
 
+    function handleDetaljiClick(nekretninaId) {
+      // Fetch detailed nekretnina information
+      PoziviAjax.getNekretninaById(nekretninaId, function (err, detalji) {
+          if (err) {
+              console.error("Error fetching nekretnina details:", err);
+              // Handle error, e.g., display an error message
+              return;
+          }
+  
+          // Create and append additional information to the nekretninaElement
+          const detaljiContainer = createElement('div', 'detalji-container');
+          detaljiContainer.innerHTML = `
+              <p><strong>Lokacija: </strong>${detalji.lokacija}</p>
+              <p><strong>Godina izgradnje: </strong>${detalji.godina_izgradnje}</p>
+              <button onclick="otvoriDetalje(${detalji.id})">Otvori detalje</button>
+          `;
+  
+          // Check if there's already an open detalji container
+          const openDetaljiContainer = document.querySelector('.detalji-container');
+  
+          // If it exists, remove it (hide details)
+          if (openDetaljiContainer) {
+              openDetaljiContainer.remove();
+              // Set the width of all nekretnina elements back to 300px
+              document.querySelectorAll('.nekretnina').forEach(element => {
+                  element.style.width = '300px';
+              });
+          }
+  
+          // Append the detalji container to the nekretninaElement
+          const nekretninaElement = document.querySelector(`.nekretnina[data-id="${nekretninaId}"]`);
+          nekretninaElement.appendChild(detaljiContainer);
+  
+          // Set the width of the nekretninaElement to 500px
+          nekretninaElement.style.width = '500px';
+      });
+  }
+  
+  function otvoriDetalje(nekretninaId) {
+    // Redirect to detalji.html with nekretnina ID as a query parameter
+    const detaljiUrl = `detalji.html?id=${nekretninaId}`;
+    window.location.href = detaljiUrl;
+}

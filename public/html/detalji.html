@@ -1,50 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Detalji</title> 
-    <link rel="stylesheet" type="text/css" href="../css/detalji.css">
-   
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalji</title>
+    <link rel="stylesheet" type="text/css" href="../css/detalji.css">
 
+    <script src="../scripts/poziviAjax.js" defer></script>
 </head>
 <body>
     <iframe src="meni.html"></iframe>
+
     <div class="sve">
-   <div id="osnovno">
-    <div class="slika">
-    <img src="https://as1.ftcdn.net/v2/jpg/03/30/29/42/1000_F_330294238_BpmguQA2WyNHg4mWvQjnlRNEULz3IGvK.jpg" alt="slika">
+        <div id="osnovno">
+           
+        </div>
+
+        <h3>DETALJI</h3>
+        <div id="detalji">
+            
+        </div>
+
+        <h3>UPITI</h3>
+        <ul id="upiti">
+          
+        </ul>
+        <div id="postavi-upit">
+            <input type="text" id="tekst-upita" placeholder="Unesite tekst upita">
+            <button id="postavi-upit-btn">Postavi upit</button>
+        </div>
     </div>
-    <div class="info">
-    <p><strong>Naziv: </strong>Useljiv stan Sarajevo</p>
-    <p><strong>Kvadratura: </strong>58 m2</p>
-    <p><strong>Cijena: </strong>232000 KM</p>
-   </div>
-   </div>
-   <h3>DETALJI</h3>
-   <div id="detalji">
-    <div id="lijevo">
-      <p><strong>Tip grijanja: </strong>plin</p>
-      <p><strong>Lokacija: </strong>Novo Sarajevo</p>
-    </div>
-    <div id="desno">
-        <p><strong>Godina izgradnje: </strong>2019</p>
-        <p><strong>Datum objave: </strong>01.10.2023.</p>
-    </div>
-    <div id="ispod">
-        <p><strong>Opis: </strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    </div>
-   </div>
-   <h3>UPITI</h3>
-   <ul id="upiti">
-    <li class="upit">
-        <p class="username">username1</p>
-        <p class="sadrzajupita">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    </li>
-    <li class="upit">
-        <p class="username">username2</p>
-        <p class="sadrzajupita">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    </li>
-</ul>
-    </div>
+
+    <script src="../scripts/spojiDetalje.js" defer></script>
+    <script src="../scripts/spojiUpite.js" defer></script>
 </body>
 </html>

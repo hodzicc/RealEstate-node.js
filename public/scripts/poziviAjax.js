@@ -18,6 +18,10 @@ const PoziviAjax = (() => {
         ajax.send(podaci);
     }
 
+    function impl_getNekretninaById(nekretnina_id, fnCallback) {
+        posaljiAjax("GET", `nekretnina/${nekretnina_id}`, null, fnCallback );
+    }
+
     function impl_getKorisnik(fnCallback) {
         posaljiAjax("GET", "korisnik", null, fnCallback);
     }
@@ -48,6 +52,7 @@ const PoziviAjax = (() => {
         getKorisnik: impl_getKorisnik,
         putKorisnik: impl_putKorisnik,
         postUpit: impl_postUpit,
-        getNekretnine: impl_getNekretnine
+        getNekretnine: impl_getNekretnine,
+        getNekretninaById: impl_getNekretninaById
     };
 })();

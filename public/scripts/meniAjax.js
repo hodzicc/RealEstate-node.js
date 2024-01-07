@@ -25,13 +25,13 @@ function prikaziMeni(isLoggedIn) {
         odjavaElement.style.display = "inline-block";
         profilElement.style.display = "inline-block";
         nekretnineElement.style.display = "inline-block";
-        detaljiElement.style.display = "inline-block";
+        
     } else {
         prijavaElement.style.display = "inline-block";
         odjavaElement.style.display = "none";
         profilElement.style.display = "none";
         nekretnineElement.style.display = "inline-block";
-        detaljiElement.style.display = "inline-block";
+       
     }
 }
 
