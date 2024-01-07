@@ -179,86 +179,64 @@ app.post('/upit', async function (req, res) {
 
 
   
-//makreting nekretnine
-app.post('/marketing/nekretnine', function (req, res) {
-  let novePretrage = req.body.nizNekretnina;
-  fs.readFile('./public/data/marketing.json', 'utf8', (err, data) => {
-      if (err) {
-          return;
-      }
+// Marketing nekretnine
+app.post('/marketing/nekretnine', async function (req, res) {
+    try {
+        const novePretrage = req.body.nizNekretnina;
 
-      pretrage = JSON.parse(data);
+        for (let i = 0; i < novePretrage.length; i++) {
+            const nekretnina = await db.nekretnina.findByPk(parseInt(novePretrage[i]));
+            
+            if (nekretnina) {
+                await nekretnina.update({ pretrage: nekretnina.pretrage + 1 });
+            }
+        }
 
-      let indeks;
-      for (let i = 0; i < novePretrage.length; i++) {
-          indeks = pretrage.findIndex(pretraga => pretraga.id === parseInt(novePretrage[i]));
-          if (indeks === -1) {
-              indeks = pretrage.length;
-              pretrage[indeks] = {
-                  id: parseInt(novePretrage[i]),
-                  pretrage: 0,
-                  klikovi: 0
-              };
-          }
-          pretrage[indeks].pretrage += 1;
-      }
-
-      fs.writeFile("./public/data/marketing.json", JSON.stringify(pretrage, null, 2), 'utf8', (err) => {
-          if (err) {
-              throw err;
-          }
-          return res.status(200).json();
-      });
-  });
+        return res.status(200).json();
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ greska: 'Greška prilikom ažuriranja pretraga' });
+    }
 });
 
-//marketing nekretnine id
-app.post('/marketing/nekretnina/:id', function (req, res) {
-  let noviPrikaz = req.params.id;
+// Marketing nekretnine by ID
+app.post('/marketing/nekretnina/:id', async function (req, res) {
+    try {
+        const noviPrikaz = req.params.id;
+        const nekretnina = await db.nekretnina.findByPk(parseInt(noviPrikaz));
 
-  fs.readFile('./public/data/marketing.json', 'utf8', (err, data) => {
-      if (err) {
-          return;
-      }
+        if (nekretnina) {
+            // Update klikovi count in the database
+            await nekretnina.update({ klikovi: nekretnina.klikovi + 1 });
+        }
 
-      pretrage = JSON.parse(data);
-
-      let indeks = pretrage.findIndex(pretraga => pretraga.id === parseInt(noviPrikaz));
-      if (indeks === -1) {
-          indeks = pretrage.length;
-          pretrage[indeks] = {
-              id: parseInt(noviPrikaz),
-              pretrage: 0,
-              klikovi: 0
-          };
-      }
-      pretrage[indeks].klikovi += 1;
-
-      fs.writeFile("./public/data/marketing.json", JSON.stringify(pretrage, null, 2), 'utf8', (err) => {
-          if (err) {
-              throw err;
-          }
-          return res.status(200).json();
-      });
-  });
+        return res.status(200).json();
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ greska: 'Greška prilikom ažuriranja broja klikova' });
+    }
 });
 
 //marketing osvjezi
-app.post('/marketing/osvjezi', function (req, res) {
-  fs.readFile('./public/data/marketing.json', 'utf8', (err, data) => {
-      if (err) {
-          return;
-      }
-
-      pretrage = JSON.parse(data);
+app.post('/marketing/osvjezi', async function (req, res) {
+  
 
       if (req.body && req.body.nizNekretnina) {
           let nizIdeva = req.body.nizNekretnina;
           let nekretnine = [];
 
           for (let i = 0; i < nizIdeva.length; i++)
-              nekretnine.push(pretrage.find(data => data.id === parseInt(nizIdeva[i])));
-
+          {
+            const nekretnina = await db.nekretnina.findByPk(parseInt(nizIdeva[i]));
+            
+            if (nekretnina) {
+                nekretnine.push({
+                    id: nekretnina.id,
+                    pretrage: nekretnina.pretrage,
+                    klikovi: nekretnina.klikovi
+                });
+            }
+        }
           req.session.nizNekretnina = nekretnine;
           return res.status(200).json(nekretnine);
       } else {
@@ -266,14 +244,18 @@ app.post('/marketing/osvjezi', function (req, res) {
           let promijenjeneNekretnine = [];
 
           for (let i = 0; i < nizNekretnina.length; i++) {
-              let podaci = pretrage.find(data => data.id === parseInt(nizNekretnina[i].id));
+              let podaci =await db.nekretnina.findByPk(parseInt(nizNekretnina[i].id));
 
               if (podaci && (podaci.klikovi !== parseInt(nizNekretnina[i].klikovi) || podaci.pretrage !== parseInt(nizNekretnina[i].pretraga)))
-                  promijenjeneNekretnine.push(podaci);
+                  promijenjeneNekretnine.push({
+                    id: podaci.id,
+                    pretrage: podaci.pretrage,
+                    klikovi: podaci.klikovi
+                });
           }
           return res.status(200).json(promijenjeneNekretnine);
       }
-  });
+  
 });
 
 

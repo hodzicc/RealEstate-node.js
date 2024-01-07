@@ -10,7 +10,9 @@ module.exports = function(sequelize,DataTypes){
         lokacija: Sequelize.STRING,
         godina_izgradnje: Sequelize.INTEGER,
         datum_objave: Sequelize.DATE,
-        opis: Sequelize.STRING
+        opis: Sequelize.STRING,
+        pretrage: Sequelize.INTEGER,
+        klikovi: Sequelize.INTEGER
     })
     return Nekretnina;
 };
