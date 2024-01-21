@@ -218,44 +218,35 @@ app.post('/marketing/nekretnina/:id', async function (req, res) {
 
 //marketing osvjezi
 app.post('/marketing/osvjezi', async function (req, res) {
-  
+    if (req.body && req.body.nizNekretnina) {
+        let nizIdeva = req.body.nizNekretnina;
+        let nekretnine = [];
 
-      if (req.body && req.body.nizNekretnina) {
-          let nizIdeva = req.body.nizNekretnina;
-          let nekretnine = [];
-
-          for (let i = 0; i < nizIdeva.length; i++)
-          {
-            const nekretnina = await db.nekretnina.findByPk(parseInt(nizIdeva[i]));
-            
-            if (nekretnina) {
-                nekretnine.push({
-                    id: nekretnina.id,
-                    pretrage: nekretnina.pretrage,
-                    klikovi: nekretnina.klikovi
-                });
-            }
+        for (let i = 0; i < nizIdeva.length; i++) {
+            await db.nekretnina.findOne({ where: { id: nizIdeva[i] } }).then((nekretnina) => {
+                nekretnine.push(nekretnina);
+            });
         }
-          req.session.nizNekretnina = nekretnine;
-          return res.status(200).json(nekretnine);
-      } else {
-          const nizNekretnina = req.session.nizNekretnina;
-          let promijenjeneNekretnine = [];
 
-          if(nizNekretnina)
-          for (let i = 0; i < nizNekretnina.length; i++) {
-              let podaci =await db.nekretnina.findByPk(parseInt(nizNekretnina[i].id));
+        req.session.nizNekretnina = nekretnine;
+        return res.status(200).json(nekretnine);
+    } else {
+        const nizNekretnina = req.session.nizNekretnina;
+        let promijenjeneNekretnine = [];
 
-              if (podaci && (podaci.klikovi !== parseInt(nizNekretnina[i].klikovi) || podaci.pretrage !== parseInt(nizNekretnina[i].pretraga)))
-                  promijenjeneNekretnine.push({
-                    id: podaci.id,
-                    pretrage: podaci.pretrage,
-                    klikovi: podaci.klikovi
-                });
-          }
-          return res.status(200).json(promijenjeneNekretnine);
-      }
-  
+        for (let i = 0; i < nizNekretnina.length; i++) {
+            await db.nekretnina.findOne({ where: { id: nizNekretnina[i].id } }).then((nekretnina) => {
+                if (nekretnina.pretrage !== parseInt(nizNekretnina[i].pretrage) || nekretnina.klikovi !== parseInt(nizNekretnina[i].klikovi)){
+                    nizNekretnina[i] = nekretnina;
+                    promijenjeneNekretnine.push(nekretnina)
+                    }
+            });
+        }
+
+        req.session.nizNekretnina = nizNekretnina;
+
+        return res.status(200).json(promijenjeneNekretnine);
+    }
 });
 
 // Marketing nekretnine by ID
